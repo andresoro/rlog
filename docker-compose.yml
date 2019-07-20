@@ -4,6 +4,10 @@ services:
     build: .
     depends_on:
       - db
+    environment:
+      DB: dev
+      DB_USER: dev
+      DB_PASS: dev
   db:
     image: postgres
     environment:
@@ -12,3 +16,5 @@ services:
       POSTGRES_PASS: dev
     ports:
       - 5432:5432
+    logging:
+      driver: none
