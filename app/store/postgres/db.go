@@ -8,9 +8,10 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // postgres driver
 )
 
+// DB wrap around an sql connection
 type DB struct {
 	conn *sql.DB
 }
@@ -30,6 +31,7 @@ func (db *DB) Connect() error {
 	db.conn = conn
 
 	log.Println("Attempting to register connection with postgres db...")
+	log.Println("Will abort if connection fails after 10 seconds")
 	for i := 0; i < 5; i++ {
 		err := db.Ping()
 		// if connection is working, return
@@ -37,9 +39,8 @@ func (db *DB) Connect() error {
 			log.Println("Successfully connected to postgres db!")
 			return nil
 		}
-		// wait one second till retrying
-		log.Println("Ping to db failed, sleeping one second and trying again")
-		time.Sleep(time.Second)
+		// wait for db to initialize
+		time.Sleep(2 * time.Second)
 	}
 
 	return errors.New("Could not connect to db")
@@ -48,4 +49,9 @@ func (db *DB) Connect() error {
 // Ping db server to see if connection is alive and working
 func (db *DB) Ping() error {
 	return db.conn.Ping()
+}
+
+// Close the connection to postgres
+func (db *DB) Close() error {
+	return db.conn.Close()
 }
