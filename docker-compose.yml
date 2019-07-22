@@ -5,7 +5,7 @@ services:
     depends_on:
       - db
     environment:
-      DB: dev
+      DB_NAME: dev
       DB_USER: dev
       DB_PASS: dev
   db:

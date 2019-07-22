@@ -7,7 +7,9 @@ import (
 	"log"
 	"time"
 
-	_ "github.com/lib/pq" // postgres driver
+	migrate "github.com/rubenv/sql-migrate"
+
+	_ "github.com/lib/pq"
 )
 
 // Config holds postgres related variables
@@ -41,6 +43,13 @@ func (db *DB) Connect() error {
 		// if connection is working, return
 		if err == nil {
 			log.Println("Successfully connected to postgres db!")
+
+			log.Println("Migrating database")
+			err := db.Migrate()
+			if err != nil {
+				return err
+			}
+			log.Println("Migration completed successfully")
 			return nil
 		}
 		// wait for db to initialize
@@ -48,6 +57,19 @@ func (db *DB) Connect() error {
 	}
 
 	return errors.New("Could not connect to db")
+}
+
+func (db *DB) Migrate() error {
+	migrations := &migrate.FileMigrationSource{
+		Dir: "/migrations",
+	}
+
+	n, err := migrate.Exec(db.conn, "postgres", migrations, migrate.Up)
+	if err != nil {
+		return err
+	}
+	log.Printf("Successfully applied %d migrations\n", n)
+	return nil
 }
 
 // Ping db server to see if connection is alive and working
