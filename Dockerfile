@@ -14,16 +14,17 @@ COPY ./go.mod ./go.sum ./
 RUN go mod download
 
 # import source code
-COPY ./ ./ 
+COPY ./ ./
 
 # build statically linked binary to /app
 RUN CGO_ENABLED=0 go build -installsuffix 'static' -o /app .
 
 FROM scratch AS final
 
-COPY --from=builder /app/ app
+COPY --from=builder /app/ /bin/app
+COPY  /app/store/postgres/migrations/ /migrations/
 
 EXPOSE 8080
 
-ENTRYPOINT ["/app"]
+ENTRYPOINT ["/bin/app"]
 
