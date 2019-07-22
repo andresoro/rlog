@@ -5,24 +5,28 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	_ "github.com/lib/pq" // postgres driver
 )
 
+// Config holds postgres related variables
+type Config struct {
+	User string
+	Pass string
+	DB   string
+}
+
 // DB wrap around an sql connection
 type DB struct {
-	conn *sql.DB
+	conn   *sql.DB
+	Config *Config
 }
 
 // Connect to postgres db, uses ENV variables from docker image
 func (db *DB) Connect() error {
-	user := os.Getenv("DB_USER")
-	pass := os.Getenv("DB_PASS")
-	name := os.Getenv("DB")
 
-	s := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", "db", 5432, user, pass, name)
+	s := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", "db", 5432, db.Config.User, db.Config.Pass, db.Config.DB)
 	conn, err := sql.Open("postgres", s)
 	if err != nil {
 		return err
