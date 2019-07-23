@@ -14,9 +14,10 @@ import (
 
 // Config holds postgres related variables
 type Config struct {
-	User string
-	Pass string
-	DB   string
+	User      string
+	Pass      string
+	DB        string
+	Migration string
 }
 
 // DB wrap around an sql connection
@@ -37,38 +38,35 @@ func (db *DB) Connect() error {
 	db.conn = conn
 
 	log.Println("Attempting to register connection with postgres db...")
-	log.Println("Will abort if connection fails after 10 seconds")
-	for i := 0; i < 5; i++ {
+	log.Println("Will abort if connection fails after 30 seconds")
+	for i := 0; i < 15; i++ {
 		err := db.Ping()
-		// if connection is working, return
-		if err == nil {
-			log.Println("Successfully connected to postgres db!")
-
-			log.Println("Migrating database")
-			err := db.Migrate()
-			if err != nil {
-				return err
-			}
-			log.Println("Migration completed successfully")
+		if err == nil { // if connection established
 			return nil
 		}
-		// wait for db to initialize
 		time.Sleep(2 * time.Second)
 	}
 
 	return errors.New("Could not connect to db")
 }
 
+// Migrate schema changes to postgres on connect
 func (db *DB) Migrate() error {
 	migrations := &migrate.FileMigrationSource{
-		Dir: "/migrations",
+		Dir: db.Config.Migration,
 	}
 
 	n, err := migrate.Exec(db.conn, "postgres", migrations, migrate.Up)
 	if err != nil {
 		return err
 	}
-	log.Printf("Successfully applied %d migrations\n", n)
+
+	if n > 0 {
+		log.Printf("Successfully applied %d migrations\n", n)
+	} else {
+		log.Println("No schema changes - no migrations needed")
+	}
+
 	return nil
 }
 

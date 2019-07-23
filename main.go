@@ -10,20 +10,31 @@ import (
 )
 
 func main() {
-	// load postgres with needed variables
+	// load postgres with envirornment variables
 	db := &postgres.DB{
 		Config: &postgres.Config{
-			User: os.Getenv("DB_USER"),
-			Pass: os.Getenv("DB_PASS"),
-			DB:   os.Getenv("DB_NAME"),
+			User:      os.Getenv("DB_USER"),
+			Pass:      os.Getenv("DB_PASS"),
+			DB:        os.Getenv("DB_NAME"),
+			Migration: os.Getenv("MIGRATION_DIR"),
 		},
 	}
 
-	srv := api.New(db)
-	err := srv.Init()
+	// ensure connection to postgres
+	err := db.Connect()
 	if err != nil {
-		panic(err)
+		log.Fatalf("Could not connect to database: %e", err)
 	}
 
-	log.Fatal(http.ListenAndServe(":8080", srv.Mux))
+	// apply any database migrations that have been introduced
+	err = db.Migrate()
+	if err != nil {
+		log.Fatalf("Could not perform database migrations: %e", err)
+	}
+
+	// init server
+	server := api.New(db)
+
+	// run
+	log.Fatal(http.ListenAndServe(":8080", server.Mux))
 }

@@ -17,18 +17,8 @@ func New(db store.Store) *API {
 		db: db,
 	}
 
-	return api
-
-}
-
-// Init will open the DB connection and initialize routes
-func (api *API) Init() error {
-	err := api.db.Connect()
-	if err != nil {
-		return err
-	}
-
 	api.Routes()
 
-	return nil
+	return api
+
 }
