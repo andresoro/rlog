@@ -9,6 +9,8 @@ services:
       DB_USER: dev
       DB_PASS: dev
       MIGRATION_DIR: /migrations
+    ports:
+      - 8080:8080
   db:
     image: postgres
     environment:

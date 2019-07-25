@@ -1,7 +1,10 @@
 package api
 
 import (
+	"database/sql"
+	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -12,26 +15,38 @@ func (a *API) Routes() {
 	// init
 	r := mux.NewRouter()
 
-	r.HandleFunc("/site/{id}", a.GetSite).Methods(http.MethodGet)
-	r.HandleFunc("/site/", a.PostSite).Methods(http.MethodPost)
-
-	r.HandleFunc("/site/{id}/stats", a.GetSiteStats).Methods(http.MethodGet)
+	// singular event methods
+	r.HandleFunc("/events/{id}", a.GetEvent).Methods("GET")
 
 	a.Mux = r
 }
 
-// GetSite /site/{id} returns information about site with given ID
-func (a *API) GetSite(w http.ResponseWriter, r *http.Request) {
+// GetEvent is the GET endpoint that returns a specific event based on
+// the ID in the URL
+func (a *API) GetEvent(w http.ResponseWriter, r *http.Request) {
+	// siteID and event id parameters
+	vars := mux.Vars(r)
+	id := vars["id"]
 
-}
+	// convert id param to int64
+	eventID, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-// PostSite /site/ recieves data about a newly registered site
-func (a *API) PostSite(w http.ResponseWriter, r *http.Request) {
+	// make db call
+	event, err := a.db.RetrieveEvent(eventID)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-}
-
-// GetSiteStats /site/{id}/stats returns data about website traffic within a timeframe
-// timeframe can either be passed or default
-func (a *API) GetSiteStats(w http.ResponseWriter, r *http.Request) {
-
+	// write json back
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(event)
 }

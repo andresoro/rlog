@@ -26,7 +26,7 @@ func main() {
 		log.Fatalf("Could not connect to database: %e", err)
 	}
 
-	// apply any database migrations that have been introduced
+	// apply any database migrations that may have been introduced
 	err = db.Migrate()
 	if err != nil {
 		log.Fatalf("Could not perform database migrations: %e", err)

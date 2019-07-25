@@ -10,4 +10,5 @@ type Store interface {
 
 	// DB model methods to actually write and retrieve our data
 	InsertEvent(*model.Event) error
+	RetrieveEvent(id int64) (*model.Event, error)
 }
