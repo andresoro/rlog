@@ -36,7 +36,16 @@ func (db *DB) RetrieveEvent(id int64) (*models.Event, error) {
 		return nil, err
 	}
 
-	err = row.Scan(&event)
+	err = row.Scan(
+		&event.StatID,
+		&event.SiteID,
+		&event.Duration,
+		&event.Host,
+		&event.Path,
+		&event.Referrer,
+		&event.Date,
+		&event.Unique,
+	)
 	if err != nil {
 		return nil, err
 	}

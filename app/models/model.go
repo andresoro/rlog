@@ -35,6 +35,6 @@ type Event struct {
 	Host     string
 	Path     string
 	Referrer string
-	Unique   bool
 	Date     time.Time
+	Unique   bool
 }

@@ -38,11 +38,12 @@ func (a *API) GetEvent(w http.ResponseWriter, r *http.Request) {
 	// make db call
 	event, err := a.db.RetrieveEvent(eventID)
 	if err != nil {
-		if err != sql.ErrNoRows {
+		if err == sql.ErrNoRows {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
