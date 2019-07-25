@@ -4,7 +4,7 @@ CREATE TABLE sites (
     name VARCHAR(50)
 );
 
-CREATE TABLE page_views (
+CREATE TABLE events (
     id SERIAL PRIMARY KEY NOT NULL,
     site_id INTEGER,
     duration INTEGER,
@@ -18,4 +18,4 @@ CREATE TABLE page_views (
 
 -- +migrate Down
 DROP TABLE IF EXISTS sites;
-DROP TABLE IF EXISTS page_views;
+DROP TABLE IF EXISTS events;

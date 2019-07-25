@@ -26,11 +26,11 @@ type PageStats struct {
 	End          time.Time
 }
 
-// PageView is an individual request made to a particular website
-// holds information relevant about given sessions
-type PageView struct {
-	SiteID   int64
+// Event is an individual request made to a particular website
+// holds information relevant about the given session
+type Event struct {
 	StatID   int64
+	SiteID   int64
 	Duration int64
 	Host     string
 	Path     string

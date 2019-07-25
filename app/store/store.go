@@ -9,5 +9,5 @@ import (
 type Store interface {
 
 	// DB model methods to actually write and retrieve our data
-	AddPageView(*model.PageView) error
+	InsertEvent(*model.Event) error
 }
