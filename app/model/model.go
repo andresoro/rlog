@@ -1,5 +1,5 @@
 // Package model holds definitions for our api and database
-package models
+package model
 
 import "time"
 
