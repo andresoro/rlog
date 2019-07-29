@@ -1,10 +1,14 @@
 package postgres
 
-import "github.com/andresoro/rlog/app/models"
+import (
+	"time"
+
+	"github.com/andresoro/rlog/app/model"
+)
 
 // InsertEvent adds an interaction with a given page to the db
-func (db *DB) InsertEvent(pv *models.Event) error {
-
+func (db *DB) InsertEvent(pv *model.Event) error {
+	// prepare query
 	q, err := db.conn.Prepare("INSERT INTO events VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")
 	defer q.Close()
 	if err != nil {
@@ -23,14 +27,15 @@ func (db *DB) InsertEvent(pv *models.Event) error {
 }
 
 // RetrieveEvent will return a single interaction given an id
-func (db *DB) RetrieveEvent(id int64) (*models.Event, error) {
+func (db *DB) RetrieveEvent(id int64) (*model.Event, error) {
+	// prepare query
 	q, err := db.conn.Prepare("SELECT * FROM events WHERE id=$1")
 	defer q.Close()
 	if err != nil {
 		return nil, err
 	}
 
-	var event models.Event
+	var event model.Event
 	row := q.QueryRow(id)
 	if err != nil {
 		return nil, err
@@ -51,4 +56,10 @@ func (db *DB) RetrieveEvent(id int64) (*models.Event, error) {
 	}
 
 	return &event, nil
+}
+
+// RetrieveAllEvents will return all interactions on a given site
+// todo: add time frame?
+func (db *DB) RetrieveAllEvents(start, end time.Time, siteID int64) ([]*model.Event, error) {
+	return nil, nil
 }

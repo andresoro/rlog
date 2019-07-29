@@ -3,8 +3,10 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -17,6 +19,7 @@ func (a *API) Routes() {
 
 	// singular event methods
 	r.HandleFunc("/events/{id}", a.GetEvent).Methods("GET")
+	r.HandleFunc("/sites/{id}/events", a.AllEvents).Methods("GET")
 
 	a.Mux = r
 }
@@ -43,11 +46,53 @@ func (a *API) GetEvent(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
 		return
 	}
 
 	// write json back
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(event)
+}
+
+// AllEvents returns all site iteractions for a site with given id
+// and a given time frame
+func (a *API) AllEvents(w http.ResponseWriter, r *http.Request) {
+
+	// site id parameter
+	ids := mux.Vars(r)["id"]
+	id, err := strconv.ParseInt(ids, 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// read request body
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// model req body as this struct
+	var req struct {
+		Start time.Time `json:"start"`
+		End   time.Time `json:"end"`
+	}
+	err = json.Unmarshal(b, &req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// hit db for events
+	events, err := a.db.RetrieveAllEvents(req.Start, req.End, id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// set headers and write json
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(events)
 }

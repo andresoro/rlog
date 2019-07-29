@@ -29,12 +29,12 @@ type PageStats struct {
 // Event is an individual request made to a particular website
 // holds information relevant about the given session
 type Event struct {
-	StatID   int64
-	SiteID   int64
-	Duration int64
-	Host     string
-	Path     string
-	Referrer string
-	Date     time.Time
-	Unique   bool
+	StatID   int64     `json:"stat_id"`
+	SiteID   int64     `json:"site_id"`
+	Duration int64     `json:"duration"`
+	Host     string    `json:"host"`
+	Path     string    `json:"path"`
+	Referrer string    `json:"referrer"`
+	Date     time.Time `json:"date"`
+	Unique   bool      `json:"unique"`
 }

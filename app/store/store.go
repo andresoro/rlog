@@ -1,14 +1,17 @@
 package store
 
 import (
-	model "github.com/andresoro/rlog/app/models"
+	"time"
+
+	model "github.com/andresoro/rlog/app/model"
 )
 
-// Store - interface for handling app models against an arbitrary database
+// Store - interface for handling app model against an arbitrary database
 // this interface is, ideally, the contract between the api and the database
 type Store interface {
 
 	// DB model methods to actually write and retrieve our data
 	InsertEvent(*model.Event) error
 	RetrieveEvent(id int64) (*model.Event, error)
+	RetrieveAllEvents(start, end time.Time, siteID int64) ([]*model.Event, error)
 }
