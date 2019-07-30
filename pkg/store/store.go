@@ -13,5 +13,5 @@ type Store interface {
 	// DB model methods to actually write and retrieve our data
 	InsertEvent(*model.Event) error
 	RetrieveEvent(id int64) (*model.Event, error)
-	RetrieveSiteStats(start, end time.Time, siteID int64) (*model.PageStats, error)
+	RetrieveSiteStats(start, end time.Time, siteID int64) (*model.SiteStats, error)
 }

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/andresoro/rlog/app/api"
-	"github.com/andresoro/rlog/app/store/postgres"
+	"github.com/andresoro/rlog/pkg/api"
+	"github.com/andresoro/rlog/pkg/store/postgres"
 )
 
 func main() {
