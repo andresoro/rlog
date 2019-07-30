@@ -22,8 +22,21 @@ type PageStats struct {
 	Path         string
 	UniqueVisits int64
 	PageViews    int64
+	Referrers    map[string]int64
 	Start        time.Time
 	End          time.Time
+}
+
+// Add an event to pagestat aggregate
+func (ps *PageStats) Add(e *Event) {
+	if e.Unique {
+		ps.UniqueVisits++
+	}
+
+	ps.PageViews++
+
+	ps.Referrers[e.Referrer]++
+
 }
 
 // Event is an individual request made to a particular website

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/andresoro/rlog/app/store"
+	"github.com/andresoro/rlog/pkg/store"
 	"github.com/gorilla/mux"
 )
 

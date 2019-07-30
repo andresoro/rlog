@@ -85,8 +85,8 @@ func (a *API) AllEvents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// hit db for events
-	events, err := a.db.RetrieveAllEvents(req.Start, req.End, id)
+	// hit db for event aggregates
+	agg, err := a.db.RetrieveSiteStats(req.Start, req.End, id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -94,5 +94,5 @@ func (a *API) AllEvents(w http.ResponseWriter, r *http.Request) {
 
 	// set headers and write json
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(events)
+	json.NewEncoder(w).Encode(agg)
 }
