@@ -109,5 +109,9 @@ func (db *DB) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.Site
 		Pages:  make([]*model.PageStats, 0),
 	}
 
+	for _, p := range pageStats {
+		_ = append(siteStats.Pages, p)
+	}
+
 	return siteStats, nil
 }
