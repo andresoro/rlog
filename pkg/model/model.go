@@ -9,6 +9,19 @@ type Site struct {
 	Name string
 }
 
+// Event is an individual request made to a particular website
+// holds information relevant about the given session
+type Event struct {
+	StatID   int64     `json:"stat_id"`
+	SiteID   int64     `json:"site_id"`
+	Duration int64     `json:"duration"`
+	Host     string    `json:"host"`
+	Path     string    `json:"path"`
+	Referrer string    `json:"referrer"`
+	Date     time.Time `json:"date"`
+	Unique   bool      `json:"unique"`
+}
+
 // SiteStats represent aggregated stats of a website for a given timeframe
 type SiteStats struct {
 	SiteID int64
@@ -37,17 +50,4 @@ func (ps *PageStats) Add(e *Event) {
 
 	ps.Referrers[e.Referrer]++
 
-}
-
-// Event is an individual request made to a particular website
-// holds information relevant about the given session
-type Event struct {
-	StatID   int64     `json:"stat_id"`
-	SiteID   int64     `json:"site_id"`
-	Duration int64     `json:"duration"`
-	Host     string    `json:"host"`
-	Path     string    `json:"path"`
-	Referrer string    `json:"referrer"`
-	Date     time.Time `json:"date"`
-	Unique   bool      `json:"unique"`
 }
