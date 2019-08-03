@@ -8,20 +8,61 @@ import (
 )
 
 func TestCollect(t *testing.T) {
-	req, err := http.NewRequest("GET", "/collect/url/path/test", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	api := &API{}
+	t.Run("test good url", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/collect/ID/path/test", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(api.Collect)
-	handler.ServeHTTP(rr, req)
+		api := &API{}
 
-	if rr.Code != http.StatusOK {
-		t.Error()
-	}
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(api.Collect)
+		handler.ServeHTTP(rr, req)
 
-	log.Println(rr.Body.String())
+		if rr.Code != http.StatusOK {
+			t.Error()
+		}
+
+		log.Println(rr.Body.String())
+	})
+
+	t.Run("test bad URL", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/collect/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		api := &API{}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(api.Collect)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Error()
+		}
+
+		log.Println(rr.Body.String())
+	})
+
+	t.Run("test only siteID", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/collect/ID/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		api := &API{}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(api.Collect)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Error()
+		}
+
+		log.Println(rr.Body.String())
+	})
 }

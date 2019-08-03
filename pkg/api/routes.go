@@ -14,7 +14,8 @@ func (a *API) Routes() {
 	r.HandleFunc("/events/{id}", a.GetEvent).Methods("GET")
 	r.HandleFunc("/sites/{id}", a.AllEvents).Methods("GET")
 
-	// collection endpoint to recieve tracking data from clients
+	// collection catch all endpoint to recieve tracking data from clients
+	// this endpoint serves a 1x1 pixel
 	r.PathPrefix("/collect").HandlerFunc(a.Collect)
 
 	a.Mux = r
