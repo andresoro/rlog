@@ -29,20 +29,30 @@ func (a *API) Collect(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// path minus the /collect/ prefix i.e siteID followed by params
-	key := strings.Join(splitPath[1:], "")
+	var (
+		siteID string
+		key    string
+	)
 
-	go a.logHit(key, r)
+	payload := splitPath[1:]
+	siteID = payload[0]
+
+	// if key is included in url along with siteID
+	if len(payload) > 1 {
+		key = strings.Join(payload[1:], "/")
+	}
 
 	// add db siteID check
+	a.logHit(siteID, key, r)
 
 	w.Header().Set("Content-Type", "image/gif")
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private")
 	w.Header().Set("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
-	w.Write([]byte(Pixel))
+	w.Write([]byte(key))
 }
 
-func (a *API) logHit(key string, r *http.Request) error {
-	return
+func (a *API) logHit(siteID, key string, r *http.Request) error {
+	return nil
 }
 
 func (a *API) cookie(r *http.Request) {
