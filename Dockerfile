@@ -22,7 +22,7 @@ RUN CGO_ENABLED=0 go build -installsuffix 'static' -o /app .
 FROM scratch AS final
 
 COPY --from=builder /app/ /bin/app
-COPY  /app/store/postgres/migrations/ /migrations/
+COPY  /pkg/store/postgres/migrations/ /migrations/
 
 EXPOSE 8080
 

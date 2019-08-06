@@ -12,42 +12,37 @@ type Site struct {
 // Event is an individual request made to a particular website
 // holds information relevant about the given session
 type Event struct {
-	StatID   int64     `json:"stat_id"`
-	SiteID   int64     `json:"site_id"`
-	Duration int64     `json:"duration"`
-	Host     string    `json:"host"`
-	Path     string    `json:"path"`
-	Referrer string    `json:"referrer"`
-	Date     time.Time `json:"date"`
-	Unique   bool      `json:"unique"`
+	ID     int64     `json:"stat_id"`
+	SiteID int64     `json:"site_id"`
+	Host   string    `json:"host"`
+	Key    string    `json:"key"`
+	Date   time.Time `json:"date"`
+	Unique bool      `json:"unique"`
 }
 
 // SiteStats represent aggregated stats of a website for a given timeframe
 type SiteStats struct {
 	SiteID int64
-	Pages  []*PageStats
+	Pages  []*KeyStats
 }
 
-// PageStats are aggregated statistics for a given path and a given timeframe
-type PageStats struct {
+// KeyStats are aggregated statistics for a given path and a given timeframe
+type KeyStats struct {
 	SiteID       int64
 	Host         string
-	Path         string
+	Key          string
 	UniqueVisits int64
 	PageViews    int64
-	Referrers    map[string]int64
 	Start        time.Time
 	End          time.Time
 }
 
 // Add an event to pagestat aggregate
-func (ps *PageStats) Add(e *Event) {
+func (ps *KeyStats) Add(e *Event) {
 	if e.Unique {
 		ps.UniqueVisits++
 	}
 
 	ps.PageViews++
-
-	ps.Referrers[e.Referrer]++
 
 }

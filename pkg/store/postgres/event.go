@@ -16,12 +16,10 @@ func (db *DB) InsertEvent(pv *model.Event) error {
 	}
 
 	_, err = q.Exec(pv.SiteID,
-		pv.Duration,
 		pv.Host,
-		pv.Path,
-		pv.Referrer,
-		pv.Unique,
-		pv.Date)
+		pv.Key,
+		pv.Date,
+		pv.Unique)
 
 	return err
 }
@@ -42,12 +40,10 @@ func (db *DB) RetrieveEvent(id int64) (*model.Event, error) {
 	}
 
 	err = row.Scan(
-		&event.StatID,
+		&event.ID,
 		&event.SiteID,
-		&event.Duration,
 		&event.Host,
-		&event.Path,
-		&event.Referrer,
+		&event.Key,
 		&event.Date,
 		&event.Unique,
 	)
@@ -73,17 +69,15 @@ func (db *DB) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.Site
 	}
 
 	// filter and aggregate individual events into PageStat for each path
-	pageStats := make(map[string]*model.PageStats, 0)
+	pageStats := make(map[string]*model.KeyStats, 0)
 
 	for rows.Next() {
 		var event *model.Event
 		err = rows.Scan(
-			&event.StatID,
+			&event.ID,
 			&event.SiteID,
-			&event.Duration,
 			&event.Host,
-			&event.Path,
-			&event.Referrer,
+			&event.Key,
 			&event.Date,
 			&event.Unique,
 		)
@@ -91,14 +85,14 @@ func (db *DB) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.Site
 			return nil, err
 		}
 
-		// if this is an event for a new path, create it with correct path name
-		if _, ok := pageStats[event.Path]; !ok {
-			pageStats[event.Path] = &model.PageStats{
-				Path: event.Path,
+		// if this is an event for a new key, create it with correct path name
+		if _, ok := pageStats[event.Key]; !ok {
+			pageStats[event.Key] = &model.KeyStats{
+				Key: event.Key,
 			}
 		}
 		// aggregate
-		ps := pageStats[event.Path]
+		ps := pageStats[event.Key]
 		ps.Add(event)
 	}
 
@@ -106,7 +100,7 @@ func (db *DB) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.Site
 
 	var siteStats = &model.SiteStats{
 		SiteID: siteID,
-		Pages:  make([]*model.PageStats, 0),
+		Pages:  make([]*model.KeyStats, 0),
 	}
 
 	for _, p := range pageStats {

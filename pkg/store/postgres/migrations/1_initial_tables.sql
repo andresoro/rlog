@@ -7,10 +7,8 @@ CREATE TABLE sites (
 CREATE TABLE events (
     id SERIAL PRIMARY KEY NOT NULL,
     site_id INTEGER,
-    duration INTEGER,
     host VARCHAR(50),
-    url_path VARCHAR(200),
-    referrer VARCHAR(200),
+    event_key VARCHAR(200),
     request_date DATE,
     uniq BOOLEAN,
     FOREIGN KEY (site_id) REFERENCES sites (id)
