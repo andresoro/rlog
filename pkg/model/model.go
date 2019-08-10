@@ -16,6 +16,7 @@ type Event struct {
 	SiteID int64     `json:"site_id"`
 	Host   string    `json:"host"`
 	Key    string    `json:"key"`
+	Addr   string    `json:addr`
 	Date   time.Time `json:"date"`
 	Unique bool      `json:"unique"`
 }

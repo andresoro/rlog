@@ -9,6 +9,7 @@ CREATE TABLE events (
     site_id INTEGER,
     host VARCHAR(50),
     event_key VARCHAR(200),
+    addr VARCHAR(50),
     request_date DATE,
     uniq BOOLEAN,
     FOREIGN KEY (site_id) REFERENCES sites (id)

@@ -2,8 +2,11 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/andresoro/rlog/pkg/model"
 )
 
 // Pixel GIF 1x1 1x1+0+0 8-bit sRGB 35 bytes
@@ -48,10 +51,30 @@ func (a *API) Collect(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/gif")
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private")
 	w.Header().Set("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
-	w.Write([]byte(key))
+	w.Write([]byte(Pixel))
 }
 
 func (a *API) logHit(siteID, key string, r *http.Request) error {
+
+	id, err := strconv.Atoi(siteID)
+	if err != nil {
+		return err
+	}
+
+	event := &model.Event{
+		SiteID: int64(id),
+		Host:   r.Host,
+		Key:    key,
+		Addr:   r.RemoteAddr,
+		Date:   time.Now(),
+		Unique: true,
+	}
+
+	err = a.db.InsertEvent(event)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

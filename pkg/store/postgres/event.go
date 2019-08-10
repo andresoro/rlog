@@ -9,7 +9,7 @@ import (
 // InsertEvent adds an interaction with a given page to the db
 func (db *DB) InsertEvent(pv *model.Event) error {
 	// prepare query
-	q, err := db.conn.Prepare("INSERT INTO events VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")
+	q, err := db.conn.Prepare("INSERT INTO events VALUES ($1, $2, $3, $4, $5, $6)")
 	defer q.Close()
 	if err != nil {
 		return err
@@ -18,6 +18,7 @@ func (db *DB) InsertEvent(pv *model.Event) error {
 	_, err = q.Exec(pv.SiteID,
 		pv.Host,
 		pv.Key,
+		pv.Addr,
 		pv.Date,
 		pv.Unique)
 
