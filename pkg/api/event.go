@@ -41,9 +41,9 @@ func (a *API) GetEvent(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(event)
 }
 
-// AllEvents returns all site iteractions for a site with given id
+// DatedEvents returns all site iteractions for a site with given id
 // and a given time frame
-func (a *API) AllEvents(w http.ResponseWriter, r *http.Request) {
+func (a *API) DatedEvents(w http.ResponseWriter, r *http.Request) {
 
 	// site id parameter
 	ids := mux.Vars(r)["id"]
@@ -66,7 +66,7 @@ func (a *API) AllEvents(w http.ResponseWriter, r *http.Request) {
 		Start time.Time `json:"start"`
 		End   time.Time `json:"end"`
 	}
-	// if our body contains no start/end date, default to the past 24 hours
+	// if our body contains no start/end date, return events in past 24 hours
 	if len(b) > 0 {
 		err = json.Unmarshal(b, &req)
 		if err != nil {
@@ -88,4 +88,25 @@ func (a *API) AllEvents(w http.ResponseWriter, r *http.Request) {
 	// set headers and write json
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(agg)
+}
+
+// AllEvents returns all events for a siteID
+func (a *API) AllEvents(w http.ResponseWriter, r *http.Request) {
+
+	// site id parameter
+	ids := mux.Vars(r)["id"]
+	id, err := strconv.ParseInt(ids, 10, 64)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	events, err := a.db.RetrieveAll(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(events)
 }

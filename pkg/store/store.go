@@ -14,4 +14,5 @@ type Store interface {
 	InsertEvent(*model.Event) error
 	RetrieveEvent(id int64) (*model.Event, error)
 	RetrieveSiteStats(start, end time.Time, siteID int64) (*model.SiteStats, error)
+	RetrieveAll(siteID int64) ([]*model.Event, error)
 }

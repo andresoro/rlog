@@ -110,3 +110,38 @@ func (db *DB) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.Site
 
 	return siteStats, nil
 }
+
+// RetrieveAll will return all events for a site
+func (db *DB) RetrieveAll(siteID int64) ([]*model.Event, error) {
+
+	events := make([]*model.Event, 0)
+
+	q, err := db.conn.Prepare("SELECT * FROM events WHERE site_id=$1")
+	if err != nil {
+		return events, err
+	}
+
+	rows, err := q.Query(siteID)
+	if err != nil {
+		return events, err
+	}
+
+	for rows.Next() {
+		var event *model.Event
+		err = rows.Scan(
+			&event.ID,
+			&event.SiteID,
+			&event.Host,
+			&event.Key,
+			&event.Date,
+			&event.Unique,
+		)
+		if err != nil {
+			return events, err
+		}
+
+		events = append(events, event)
+	}
+
+	return events, nil
+}
