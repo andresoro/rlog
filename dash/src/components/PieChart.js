@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
-import { Pane } from 'evergreen-ui';
+import { VictoryPie } from 'victory';
+import { Heading } from 'evergreen-ui'; 
 
 class PieChart extends Component {
     state = {  }
     render() { 
         return ( 
-            <Pane></Pane>
+            <div>
+                <Heading size={300} marginTop="default">
+                    Top key requests
+                </Heading> 
+                <VictoryPie/>
+            </div>
+            
          );
     }
 }

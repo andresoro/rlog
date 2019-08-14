@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
-import { Pane } from 'evergreen-ui';
+import { VictoryLine } from 'victory';
+import { Heading } from 'evergreen-ui';
 
 class LineChart extends Component {
     state = {  }
     render() { 
-        return ( 
-            <Pane></Pane>
+        return (
+            <div>
+                <Heading size={300} marginTop="default">
+                    Requests in past 24 hours
+                </Heading> 
+                <VictoryLine/>
+            </div>
+            
          );
     }
 }
