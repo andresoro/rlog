@@ -55,19 +55,21 @@ func (a *API) Collect(w http.ResponseWriter, r *http.Request) {
 		key = strings.Join(payload[1:], "/")
 	}
 
+	// test if site exists
+
 	a.logHit(siteID, key, r)
 
 	// if request is good, write pixel
 	w.Header().Set("Content-Type", "image/gif")
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private")
 	w.Header().Set("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
-	w.Write([]byte(key))
+	w.Write([]byte(Pixel))
 }
 
 func (a *API) logHit(siteID int, key string, r *http.Request) error {
 
 	event := &model.Event{
-		SiteID: int64(siteID),
+		SiteID: int(siteID),
 		Key:    key,
 		Addr:   r.RemoteAddr,
 		Date:   time.Now(),

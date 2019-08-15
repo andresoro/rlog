@@ -9,7 +9,7 @@ import (
 // InsertEvent adds an interaction with a given page to the db
 func (db *DB) InsertEvent(pv *model.Event) error {
 	// prepare query
-	q, err := db.conn.Prepare("INSERT INTO events VALUES ($1, $2, $3, $4, $5)")
+	q, err := db.conn.Prepare("INSERT INTO events (site_id, event_key, addr, request_date, uniq) VALUES ($1, $2, $3, $4, $5)")
 	defer q.Close()
 	if err != nil {
 		return err
@@ -25,7 +25,7 @@ func (db *DB) InsertEvent(pv *model.Event) error {
 }
 
 // RetrieveEvent will return a single interaction given an id
-func (db *DB) RetrieveEvent(id int64) (*model.Event, error) {
+func (db *DB) RetrieveEvent(id int) (*model.Event, error) {
 	// prepare query
 	q, err := db.conn.Prepare("SELECT * FROM events WHERE id=$1")
 	defer q.Close()
@@ -43,6 +43,7 @@ func (db *DB) RetrieveEvent(id int64) (*model.Event, error) {
 		&event.ID,
 		&event.SiteID,
 		&event.Key,
+		&event.Addr,
 		&event.Date,
 		&event.Unique,
 	)
@@ -54,7 +55,7 @@ func (db *DB) RetrieveEvent(id int64) (*model.Event, error) {
 }
 
 // RetrieveSiteStats will return all interactions on a given site
-func (db *DB) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.SiteStats, error) {
+func (db *DB) RetrieveSiteStats(start, end time.Time, siteID int) (*model.SiteStats, error) {
 	// get all rows for this site id
 	q, err := db.conn.Prepare("SELECT * FROM events WHERE (request_date BETWEEN $1 AND $2) AND (site_id=$3)")
 	defer q.Close()
@@ -70,12 +71,14 @@ func (db *DB) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.Site
 	// filter and aggregate individual events into PageStat for each path
 	pageStats := make(map[string]*model.KeyStats, 0)
 
+	defer rows.Close()
 	for rows.Next() {
-		var event *model.Event
+		var event model.Event
 		err = rows.Scan(
 			&event.ID,
 			&event.SiteID,
 			&event.Key,
+			&event.Addr,
 			&event.Date,
 			&event.Unique,
 		)
@@ -91,7 +94,7 @@ func (db *DB) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.Site
 		}
 		// aggregate
 		ps := pageStats[event.Key]
-		ps.Add(event)
+		ps.Add(&event)
 	}
 
 	// return aggregated site stats
@@ -109,7 +112,7 @@ func (db *DB) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.Site
 }
 
 // RetrieveAll will return all events for a site
-func (db *DB) RetrieveAll(siteID int64) ([]*model.Event, error) {
+func (db *DB) RetrieveAll(siteID int) ([]*model.Event, error) {
 
 	events := make([]*model.Event, 0)
 
@@ -123,12 +126,14 @@ func (db *DB) RetrieveAll(siteID int64) ([]*model.Event, error) {
 		return events, err
 	}
 
+	defer rows.Close()
 	for rows.Next() {
-		var event *model.Event
+		var event model.Event
 		err = rows.Scan(
 			&event.ID,
 			&event.SiteID,
 			&event.Key,
+			&event.Addr,
 			&event.Date,
 			&event.Unique,
 		)
@@ -136,7 +141,7 @@ func (db *DB) RetrieveAll(siteID int64) ([]*model.Event, error) {
 			return events, err
 		}
 
-		events = append(events, event)
+		events = append(events, &event)
 	}
 
 	return events, nil

@@ -95,9 +95,10 @@ func TestCollect(t *testing.T) {
 
 type MockStore struct{}
 
-func (m *MockStore) InsertEvent(e *model.Event) error             { return nil }
-func (m *MockStore) RetrieveEvent(id int64) (*model.Event, error) { return nil, nil }
-func (m *MockStore) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.SiteStats, error) {
+func (m *MockStore) InsertEvent(e *model.Event) error           { return nil }
+func (m *MockStore) RetrieveEvent(id int) (*model.Event, error) { return nil, nil }
+func (m *MockStore) RetrieveSiteStats(start, end time.Time, siteID int) (*model.SiteStats, error) {
 	return nil, nil
 }
-func (m *MockStore) RetrieveAll(siteID int64) ([]*model.Event, error) { return nil, nil }
+func (m *MockStore) RetrieveAll(siteID int) ([]*model.Event, error) { return nil, nil }
+func (m *MockStore) InsertSite(name string) (int, error)            { return 0, nil }

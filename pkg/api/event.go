@@ -18,8 +18,8 @@ func (a *API) GetEvent(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	// convert id param to int64
-	eventID, err := strconv.ParseInt(id, 10, 64)
+	// convert id param to int
+	eventID, err := strconv.Atoi(id)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -32,7 +32,8 @@ func (a *API) GetEvent(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
 		return
 	}
 
@@ -47,7 +48,7 @@ func (a *API) DatedEvents(w http.ResponseWriter, r *http.Request) {
 
 	// site id parameter
 	ids := mux.Vars(r)["id"]
-	id, err := strconv.ParseInt(ids, 10, 64)
+	id, err := strconv.Atoi(ids)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -95,7 +96,7 @@ func (a *API) AllEvents(w http.ResponseWriter, r *http.Request) {
 
 	// site id parameter
 	ids := mux.Vars(r)["id"]
-	id, err := strconv.ParseInt(ids, 10, 64)
+	id, err := strconv.Atoi(ids)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("input a correct site ID"))
