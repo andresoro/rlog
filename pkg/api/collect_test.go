@@ -5,24 +5,28 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
+
+	"github.com/andresoro/rlog/pkg/model"
 )
 
 func TestCollect(t *testing.T) {
 
 	t.Run("test good url", func(t *testing.T) {
-		req, err := http.NewRequest("GET", "/collect/ID/path/test", nil)
+		req, err := http.NewRequest("GET", "/collect/123/path/test", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		api := &API{}
+		a := New(&MockStore{})
+		a.Routes()
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(api.Collect)
+		handler := http.HandlerFunc(a.Collect)
 		handler.ServeHTTP(rr, req)
 
 		if rr.Code != http.StatusOK {
-			t.Error()
+			t.Error(rr.Code)
 		}
 
 		log.Println(rr.Body.String())
@@ -34,10 +38,11 @@ func TestCollect(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		api := &API{}
+		a := New(&MockStore{})
+		a.Routes()
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(api.Collect)
+		handler := http.HandlerFunc(a.Collect)
 		handler.ServeHTTP(rr, req)
 
 		if rr.Code != http.StatusBadRequest {
@@ -48,15 +53,16 @@ func TestCollect(t *testing.T) {
 	})
 
 	t.Run("test only siteID", func(t *testing.T) {
-		req, err := http.NewRequest("GET", "/collect/ID/", nil)
+		req, err := http.NewRequest("GET", "/collect/123/", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		api := &API{}
+		a := New(&MockStore{})
+		a.Routes()
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(api.Collect)
+		handler := http.HandlerFunc(a.Collect)
 		handler.ServeHTTP(rr, req)
 
 		if rr.Code != http.StatusOK {
@@ -66,3 +72,12 @@ func TestCollect(t *testing.T) {
 		log.Println(rr.Body.String())
 	})
 }
+
+type MockStore struct{}
+
+func (m *MockStore) InsertEvent(e *model.Event) error             { return nil }
+func (m *MockStore) RetrieveEvent(id int64) (*model.Event, error) { return nil, nil }
+func (m *MockStore) RetrieveSiteStats(start, end time.Time, siteID int64) (*model.SiteStats, error) {
+	return nil, nil
+}
+func (m *MockStore) RetrieveAll(siteID int64) ([]*model.Event, error) { return nil, nil }

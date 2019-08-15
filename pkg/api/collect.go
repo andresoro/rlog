@@ -19,58 +19,62 @@ const Pixel = "\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\xFF\x00\xFF\xFF\xFF\
 // by embeding images alone
 // e.x /collect/{siteID}/any/url/path
 func (a *API) Collect(w http.ResponseWriter, r *http.Request) {
-	// remove beginning and trailing slash
-	url := strings.Trim(r.URL.Path, "/")
 
-	// split at every slash
-	splitPath := strings.Split(url, "/")
+	// parse URL for site ID and request key, request key is anything after ID (could be nil)
 
-	// if split url does not contain a possible siteID
+	//trim slashes and slice at each intermediary slash
+	trim := strings.Trim(r.URL.Path, "/")
+	splitPath := strings.Split(trim, "/")
+
+	// if path does not even contain a possible siteID -> bad request
 	if len(splitPath) < 2 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("error: need siteID"))
+		return
+	}
+
+	// ignore '/collect/' in payload, siteID should be following param
+	payload := splitPath[1:]
+	id := payload[0]
+
+	// ensure id is an int aka valid siteID
+	siteID, err := strconv.Atoi(id)
+	if err != nil {
+		if err == strconv.ErrSyntax {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("error: siteID is not valid"))
+			return
+		}
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	// path minus the /collect/ prefix i.e siteID followed by params
-	var (
-		siteID string
-		key    string
-	)
-
-	payload := splitPath[1:]
-	siteID = payload[0]
-
-	// if key is included in url along with siteID
+	var key string
 	if len(payload) > 1 {
+		// if key is included in url
 		key = strings.Join(payload[1:], "/")
 	}
 
-	// add db siteID check
 	a.logHit(siteID, key, r)
 
+	// if request is good, write pixel
 	w.Header().Set("Content-Type", "image/gif")
 	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate, private")
 	w.Header().Set("Last-Modified", time.Now().UTC().Format(http.TimeFormat))
-	w.Write([]byte(Pixel))
+	w.Write([]byte(key))
 }
 
-func (a *API) logHit(siteID, key string, r *http.Request) error {
-
-	id, err := strconv.Atoi(siteID)
-	if err != nil {
-		return err
-	}
+func (a *API) logHit(siteID int, key string, r *http.Request) error {
 
 	event := &model.Event{
-		SiteID: int64(id),
-		Host:   r.Host,
+		SiteID: int64(siteID),
 		Key:    key,
 		Addr:   r.RemoteAddr,
 		Date:   time.Now(),
 		Unique: true,
 	}
 
-	err = a.db.InsertEvent(event)
+	err := a.db.InsertEvent(event)
 	if err != nil {
 		return err
 	}
