@@ -52,6 +52,26 @@ func TestCollect(t *testing.T) {
 		log.Println(rr.Body.String())
 	})
 
+	t.Run("test bad siteID", func(t *testing.T) {
+		req, err := http.NewRequest("GET", "/collect/bad_id/hello", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		a := New(&MockStore{})
+		a.Routes()
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(a.Collect)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusBadRequest {
+			t.Error()
+		}
+
+		log.Println(rr.Body.String())
+	})
+
 	t.Run("test only siteID", func(t *testing.T) {
 		req, err := http.NewRequest("GET", "/collect/123/", nil)
 		if err != nil {
