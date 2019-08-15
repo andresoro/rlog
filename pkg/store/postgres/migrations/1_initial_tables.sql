@@ -7,7 +7,6 @@ CREATE TABLE sites (
 CREATE TABLE events (
     id SERIAL PRIMARY KEY NOT NULL,
     site_id INTEGER,
-    host VARCHAR(50),
     event_key VARCHAR(200),
     addr VARCHAR(50),
     request_date DATE,

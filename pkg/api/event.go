@@ -98,6 +98,7 @@ func (a *API) AllEvents(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(ids, 10, 64)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("input a correct site ID"))
 		return
 	}
 
