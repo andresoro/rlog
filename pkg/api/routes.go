@@ -1,6 +1,9 @@
 package api
 
 import (
+	"net/http"
+	"os"
+
 	"github.com/gorilla/mux"
 )
 
@@ -19,6 +22,8 @@ func (a *API) Routes() {
 	// collection catch all endpoint to recieve tracking data from clients
 	// this endpoint serves a 1x1 pixel
 	r.PathPrefix("/collect").HandlerFunc(a.Collect)
+
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(os.Getenv("FRONTEND_DIR"))))
 
 	a.Mux = r
 }
