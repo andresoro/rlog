@@ -21,6 +21,7 @@ func (a *API) Routes() {
 	api.HandleFunc("/sites/{id}", a.DatedEvents).Methods("GET")
 	api.HandleFunc("/sites/all/{id}", a.AllEvents).Methods("GET")
 	api.HandleFunc("/sites/new/{name}", a.NewSite).Methods("GET")
+	api.HandleFunc("/sites/all", a.GetSites).Methods("GET")
 
 	// collection catch all endpoint to recieve tracking data from clients
 	// this endpoint serves a 1x1 pixel

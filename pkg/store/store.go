@@ -16,4 +16,5 @@ type Store interface {
 	RetrieveSiteStats(start, end time.Time, siteID int) (*model.SiteStats, error)
 	RetrieveAll(siteID int) ([]*model.Event, error)
 	InsertSite(name string) (int, error)
+	GetSites() ([]*model.Site, error)
 }
