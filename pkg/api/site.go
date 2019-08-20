@@ -20,3 +20,7 @@ func (a *API) NewSite(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(id)
 }
+
+func (a *API) GetSites(w http.ResponseWriter, r *http.Request) {
+
+}
